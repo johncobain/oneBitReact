@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  StatusBar,
-  Text,
-  View,
-  SafeAreaView,
-  Platform,
-} from "react-native";
+import { StyleSheet, StatusBar, SafeAreaView, Platform } from "react-native";
 
 import CurrentPrice from "./src/components/CurrentPrice";
 import HistoryGraphic from "./src/components/HistoryGraphic";
 import QuotationList from "./src/components/QuotationList";
-import QuotationsItems from "./src/components/QuotationList/QuotationsItems";
 
 function convertTimestamp(timestamp, timezone) {
   // Calcula o deslocamento de GMT-03:00 em milissegundos
@@ -89,7 +81,7 @@ async function getListCoins(url = "") {
 }
 
 export default function App() {
-  const [coinsList, setCoinsList] = useState([]);
+  const [coinsList, setCoinsList] = useState([{ valor: 0 }]);
   const [coinsGraphicList, setCoinsGraphicList] = useState([0]);
   const [days, setDays] = useState(30);
   const [updateData, setUpdateData] = useState(false);
@@ -101,8 +93,8 @@ export default function App() {
 
   useEffect(() => {
     getListCoins(url(days)).then((data) => {
-      setCoinsList(data.reverse());
       setCoinsGraphicList(data.map((item) => item.valor));
+      setCoinsList(data.reverse());
     });
     if (updateData) {
       setUpdateData(false);
@@ -112,8 +104,8 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#f50d41" barStyle="dark-content" />
-      <CurrentPrice />
-      <HistoryGraphic />
+      <CurrentPrice priceNow={coinsList[0].valor} />
+      <HistoryGraphic infoDataGraphic={coinsGraphicList} />
       <QuotationList filterDay={updateDay} listTransactions={coinsList} />
     </SafeAreaView>
   );
